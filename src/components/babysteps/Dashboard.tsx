@@ -72,7 +72,7 @@ export function Dashboard({ babyId, userId }: { babyId: string; userId: string }
 
   async function addEvent(type: string, details: Record<string, any>) {
     const { error } = await supabase.from("events").insert({ baby_id: babyId, type, details, created_by: userId });
-    if (error) return toast.error("השמירה נכשלה");
+    if (error) { toast.error("השמירה נכשלה"); return; }
     setSheet(null);
     toast.success("נשמר ✓");
   }
@@ -80,7 +80,7 @@ export function Dashboard({ babyId, userId }: { babyId: string; userId: string }
   async function toggleSleep() {
     if (activeSleep) {
       const { error } = await supabase.from("events").update({ ended_at: new Date().toISOString() }).eq("id", activeSleep.id);
-      if (error) return toast.error("השמירה נכשלה");
+      if (error) { toast.error("השמירה נכשלה"); return; }
       toast.success("בוקר טוב ☀️");
     } else {
       await addEvent("sleep", {});
@@ -202,7 +202,7 @@ const toneCls = {
 } as const;
 
 function StatusCard({ tone, icon, title, main, sub, mono }: {
-  tone: keyof typeof toneCls; icon: React.ReactNode; title: string; main: string; sub?: string; mono?: boolean;
+  tone: keyof typeof toneCls; icon: React.ReactNode; title: string; main: string; sub?: string | undefined; mono?: boolean;
 }) {
   const t = toneCls[tone];
   return (
@@ -237,11 +237,11 @@ function TypeDot({ type }: { type: string }) {
     diaper: ["diaper", <Droplets key="d" className="h-4 w-4" />],
     sleep: ["sleep", <Moon key="s" className="h-4 w-4" />],
   };
-  const [tone, icon] = map[type] ?? map.feeding;
+  const [tone, icon] = map[type] ?? map["feeding"]!;
   return <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${toneCls[tone].soft} ${toneCls[tone].text}`}>{icon}</div>;
 }
 
-function FeedingForm({ onSave, initial }: { onSave: (d: Record<string, any>) => void; initial?: Record<string, any> }) {
+function FeedingForm({ onSave, initial }: { onSave: (d: Record<string, any>) => void; initial?: any }) {
   const [method, setMethod] = useState<"bottle" | "breast">(initial?.method ?? "bottle");
   const [side, setSide] = useState<string>(initial?.side ?? "left");
   const [minutes, setMinutes] = useState<number>(initial?.minutes ?? 10);
@@ -317,7 +317,7 @@ function InvitePanel({ code, members }: { code: string; members: Member[] }) {
 function EditForm({ event, onDone }: { event: BabyEvent; onDone: () => void }) {
   const [start, setStart] = useState(toLocalInput(event.started_at));
   const [end, setEnd] = useState(event.ended_at ? toLocalInput(event.ended_at) : "");
-  const [details, setDetails] = useState<Record<string, any>>(event.details);
+  const [details, setDetails] = useState<any>(event.details);
 
   async function save(d = details) {
     const { error } = await supabase.from("events").update({
@@ -325,13 +325,13 @@ function EditForm({ event, onDone }: { event: BabyEvent; onDone: () => void }) {
       ended_at: event.type === "sleep" && end ? new Date(end).toISOString() : event.ended_at,
       details: d,
     }).eq("id", event.id);
-    if (error) return toast.error("השמירה נכשלה");
+    if (error) { toast.error("השמירה נכשלה"); return; }
     toast.success("עודכן"); onDone();
   }
   async function remove() {
     if (!confirm("למחוק את האירוע?")) return;
     const { error } = await supabase.from("events").delete().eq("id", event.id);
-    if (error) return toast.error("המחיקה נכשלה");
+    if (error) { toast.error("המחיקה נכשלה"); return; }
     toast.success("נמחק"); onDone();
   }
   const input = "h-12 w-full rounded-xl border border-input bg-background px-3 text-base";

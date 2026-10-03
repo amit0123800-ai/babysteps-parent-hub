@@ -6,7 +6,7 @@ export interface BabyEvent {
   type: EventType;
   started_at: string;
   ended_at: string | null;
-  details: Record<string, any>;
+  details: any;
   created_by: string;
 }
 

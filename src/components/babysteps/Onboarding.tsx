@@ -6,7 +6,7 @@ import { LogOut } from "lucide-react";
 
 const roles = ["אמא", "אבא", "סבתא", "סבא", "מטפל/ת"];
 
-export function Onboarding({ initialCode, onDone }: { initialCode?: string; onDone: () => void }) {
+export function Onboarding({ initialCode, onDone }: { initialCode?: string | undefined; onDone: () => void }) {
   const [tab, setTab] = useState<"create" | "join">(initialCode ? "join" : "create");
   const [role, setRole] = useState("אמא");
   const [name, setName] = useState("");
