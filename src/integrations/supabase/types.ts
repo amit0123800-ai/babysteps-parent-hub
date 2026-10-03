@@ -14,13 +14,128 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      babies: {
+        Row: {
+          birthdate: string
+          created_at: string
+          created_by: string
+          gender: string
+          id: string
+          invite_code: string
+          name: string
+        }
+        Insert: {
+          birthdate: string
+          created_at?: string
+          created_by: string
+          gender?: string
+          id?: string
+          invite_code?: string
+          name: string
+        }
+        Update: {
+          birthdate?: string
+          created_at?: string
+          created_by?: string
+          gender?: string
+          id?: string
+          invite_code?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          baby_id: string
+          created_at: string
+          created_by: string
+          details: Json
+          ended_at: string | null
+          id: string
+          started_at: string
+          type: string
+        }
+        Insert: {
+          baby_id: string
+          created_at?: string
+          created_by?: string
+          details?: Json
+          ended_at?: string | null
+          id?: string
+          started_at?: string
+          type: string
+        }
+        Update: {
+          baby_id?: string
+          created_at?: string
+          created_by?: string
+          details?: Json
+          ended_at?: string | null
+          id?: string
+          started_at?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      family_members: {
+        Row: {
+          baby_id: string
+          created_at: string
+          id: string
+          role_label: string
+          user_id: string
+        }
+        Insert: {
+          baby_id: string
+          created_at?: string
+          id?: string
+          role_label?: string
+          user_id: string
+        }
+        Update: {
+          baby_id?: string
+          created_at?: string
+          id?: string
+          role_label?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_members_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_baby: {
+        Args: {
+          _birthdate: string
+          _gender: string
+          _name: string
+          _role_label: string
+        }
+        Returns: string
+      }
+      is_family_member: { Args: { _baby_id: string }; Returns: boolean }
+      join_family: {
+        Args: { _code: string; _role_label: string }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
