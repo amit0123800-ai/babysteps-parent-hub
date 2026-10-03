@@ -1,4 +1,4 @@
-export type EventType = "feeding" | "diaper" | "sleep";
+export type EventType = "feeding" | "diaper" | "sleep" | "medicine" | "temperature";
 
 export interface BabyEvent {
   id: string;
@@ -21,6 +21,27 @@ export interface Baby {
 export interface Member {
   user_id: string;
   role_label: string;
+}
+
+export interface InventoryItem {
+  id: string;
+  baby_id: string;
+  kind: string;
+  name: string;
+  unit: string;
+  quantity: number;
+  restock_amount: number;
+  restock_label: string;
+  low_threshold: number;
+  critical_threshold: number;
+}
+
+export interface ShoppingItem {
+  id: string;
+  baby_id: string;
+  name: string;
+  done: boolean;
+  created_at: string;
 }
 
 export function formatDuration(ms: number): string {
@@ -62,17 +83,34 @@ export function babyAge(birthdate: string, now: number): string {
 export const diaperLabels: Record<string, string> = { wet: "פיפי", dirty: "קקי", both: "פיפי + קקי" };
 export const sideLabels: Record<string, string> = { left: "שמאל", right: "ימין" };
 
+export type TempStatus = "normal" | "elevated" | "fever";
+export const tempStatusLabels: Record<TempStatus, string> = { normal: "תקין", elevated: "מוגבר", fever: "חום" };
+export function tempStatus(c: number): TempStatus {
+  if (c >= 38) return "fever";
+  if (c >= 37.5) return "elevated";
+  return "normal";
+}
+
 export function describeEvent(e: BabyEvent): string {
-  if (e.type === "diaper") return `חיתול · ${diaperLabels[e.details.kind] ?? ""}`;
-  if (e.type === "feeding") {
-    if (e.details.method === "bottle") return `בקבוק · ${e.details.ml} מ״ל`;
-    return `הנקה · ${sideLabels[e.details.side] ?? ""} · ${e.details.minutes} דק׳`;
+  const d = e.details ?? {};
+  switch (e.type) {
+    case "diaper":
+      return `חיתול · ${diaperLabels[d.kind] ?? ""}`;
+    case "feeding":
+      return d.method === "bottle"
+        ? `בקבוק · ${d.ml} מ״ל`
+        : `הנקה · ${sideLabels[d.side] ?? ""} · ${d.minutes} דק׳`;
+    case "sleep":
+      return e.ended_at
+        ? `שינה · ${formatDuration(new Date(e.ended_at).getTime() - new Date(e.started_at).getTime())}`
+        : "שינה · ישן/ה עכשיו";
+    case "medicine":
+      return `${d.name ?? "תרופה"}${d.dosage ? ` · ${d.dosage}` : ""}`;
+    case "temperature":
+      return `חום · ${Number(d.celsius).toFixed(1)}°C · ${tempStatusLabels[tempStatus(Number(d.celsius))]}`;
+    default:
+      return "";
   }
-  if (e.type === "sleep") {
-    if (!e.ended_at) return "שינה · ישן/ה עכשיו";
-    return `שינה · ${formatDuration(new Date(e.ended_at).getTime() - new Date(e.started_at).getTime())}`;
-  }
-  return "";
 }
 
 export function timeHM(iso: string) {
@@ -83,4 +121,22 @@ export function toLocalInput(iso: string) {
   const d = new Date(iso);
   const off = d.getTimezoneOffset() * 60000;
   return new Date(d.getTime() - off).toISOString().slice(0, 16);
+}
+
+/** Stock level for an inventory item. */
+export type StockLevel = "good" | "low" | "critical";
+export function stockLevel(item: InventoryItem): StockLevel {
+  if (item.quantity < item.critical_threshold) return "critical";
+  if (item.quantity < item.low_threshold) return "low";
+  return "good";
+}
+
+/** Average daily usage over the last 7 days from negative log deltas. */
+export function dailyUsage(logs: { delta: number; created_at: string }[], now: number): number {
+  const used = logs.filter((l) => l.delta < 0);
+  if (used.length === 0) return 0;
+  const total = used.reduce((s, l) => s + -l.delta, 0);
+  const first = Math.min(...used.map((l) => new Date(l.created_at).getTime()));
+  const days = Math.min(7, Math.max(1, (now - first) / 86400000));
+  return total / days;
 }
