@@ -117,11 +117,143 @@ export type Database = {
           },
         ]
       }
+      inventory_items: {
+        Row: {
+          baby_id: string
+          critical_threshold: number
+          id: string
+          kind: string
+          low_threshold: number
+          name: string
+          quantity: number
+          restock_amount: number
+          restock_label: string
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          baby_id: string
+          critical_threshold?: number
+          id?: string
+          kind: string
+          low_threshold?: number
+          name: string
+          quantity?: number
+          restock_amount?: number
+          restock_label?: string
+          unit: string
+          updated_at?: string
+        }
+        Update: {
+          baby_id?: string
+          critical_threshold?: number
+          id?: string
+          kind?: string
+          low_threshold?: number
+          name?: string
+          quantity?: number
+          restock_amount?: number
+          restock_label?: string
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_items_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory_log: {
+        Row: {
+          baby_id: string
+          created_at: string
+          delta: number
+          id: string
+          item_id: string
+        }
+        Insert: {
+          baby_id: string
+          created_at?: string
+          delta: number
+          id?: string
+          item_id: string
+        }
+        Update: {
+          baby_id?: string
+          created_at?: string
+          delta?: number
+          id?: string
+          item_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_log_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_log_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shopping_list: {
+        Row: {
+          baby_id: string
+          created_at: string
+          created_by: string
+          done: boolean
+          id: string
+          name: string
+        }
+        Insert: {
+          baby_id: string
+          created_at?: string
+          created_by?: string
+          done?: boolean
+          id?: string
+          name: string
+        }
+        Update: {
+          baby_id?: string
+          created_at?: string
+          created_by?: string
+          done?: boolean
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopping_list_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      _apply_inventory_delta: {
+        Args: { _delta: number; _item_id: string }
+        Returns: undefined
+      }
+      adjust_inventory: {
+        Args: { _delta: number; _item_id: string }
+        Returns: undefined
+      }
       create_baby: {
         Args: {
           _birthdate: string
@@ -136,6 +268,7 @@ export type Database = {
         Args: { _code: string; _role_label: string }
         Returns: string
       }
+      seed_inventory: { Args: { _baby_id: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

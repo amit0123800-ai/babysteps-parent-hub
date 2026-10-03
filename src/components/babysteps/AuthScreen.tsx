@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Baby } from "lucide-react";
+import { Baby, Eye, EyeOff } from "lucide-react";
 
 export function AuthScreen() {
   const [mode, setMode] = useState<"in" | "up">("up");
@@ -9,6 +9,7 @@ export function AuthScreen() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const [show, setShow] = useState(false);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -56,11 +57,18 @@ export function AuthScreen() {
             onChange={(e) => setEmail(e.target.value)}
             className="h-14 w-full rounded-2xl border border-input bg-background px-4 text-base outline-none focus:ring-2 focus:ring-ring"
           />
-          <input
-            type="password" required minLength={6} dir="ltr" placeholder="••••••" value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="h-14 w-full rounded-2xl border border-input bg-background px-4 text-base outline-none focus:ring-2 focus:ring-ring"
-          />
+          <div className="relative" dir="ltr">
+            <input
+              type={show ? "text" : "password"} required minLength={6} placeholder="••••••" value={password}
+              autoComplete={mode === "up" ? "new-password" : "current-password"}
+              onChange={(e) => setPassword(e.target.value)}
+              className="h-14 w-full rounded-2xl border border-input bg-background pl-4 pr-12 text-base outline-none focus:ring-2 focus:ring-ring"
+            />
+            <button type="button" onClick={() => setShow(!show)} aria-label={show ? "הסתרת סיסמה" : "הצגת סיסמה"}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2 text-muted-foreground hover:bg-muted">
+              {show ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+            </button>
+          </div>
           <button disabled={loading} className="tap h-14 w-full rounded-2xl bg-primary text-lg font-semibold text-primary-foreground disabled:opacity-60">
             {loading ? "רגע..." : mode === "up" ? "הרשמה" : "כניסה"}
           </button>
