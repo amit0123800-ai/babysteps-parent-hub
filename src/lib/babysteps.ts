@@ -1,0 +1,86 @@
+export type EventType = "feeding" | "diaper" | "sleep";
+
+export interface BabyEvent {
+  id: string;
+  baby_id: string;
+  type: EventType;
+  started_at: string;
+  ended_at: string | null;
+  details: Record<string, any>;
+  created_by: string;
+}
+
+export interface Baby {
+  id: string;
+  name: string;
+  birthdate: string;
+  gender: string;
+  invite_code: string;
+}
+
+export interface Member {
+  user_id: string;
+  role_label: string;
+}
+
+export function formatDuration(ms: number): string {
+  const totalMin = Math.max(0, Math.floor(ms / 60000));
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  if (h === 0) return `${m} דק׳`;
+  if (m === 0) return h === 1 ? "שעה" : `${h} שעות`;
+  return `${h === 1 ? "שעה" : `${h} שעות`} ו-${m} דק׳`;
+}
+
+export function formatTimer(ms: number): string {
+  const s = Math.max(0, Math.floor(ms / 1000));
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return h > 0 ? `${h}:${pad(m)}:${pad(sec)}` : `${pad(m)}:${pad(sec)}`;
+}
+
+export function ago(iso: string, now: number) {
+  return `לפני ${formatDuration(now - new Date(iso).getTime())}`;
+}
+
+export function babyAge(birthdate: string, now: number): string {
+  const b = new Date(birthdate);
+  const days = Math.floor((now - b.getTime()) / 86400000);
+  if (days < 0) return "";
+  if (days < 7) return `${days} ימים`;
+  const weeks = Math.floor(days / 7);
+  if (weeks < 13) return `${weeks} שבועות`;
+  const d = new Date(now);
+  let months = (d.getFullYear() - b.getFullYear()) * 12 + (d.getMonth() - b.getMonth());
+  if (d.getDate() < b.getDate()) months--;
+  if (months < 24) return `${months} חודשים`;
+  return `${Math.floor(months / 12)} שנים`;
+}
+
+export const diaperLabels: Record<string, string> = { wet: "פיפי", dirty: "קקי", both: "פיפי + קקי" };
+export const sideLabels: Record<string, string> = { left: "שמאל", right: "ימין" };
+
+export function describeEvent(e: BabyEvent): string {
+  if (e.type === "diaper") return `חיתול · ${diaperLabels[e.details.kind] ?? ""}`;
+  if (e.type === "feeding") {
+    if (e.details.method === "bottle") return `בקבוק · ${e.details.ml} מ״ל`;
+    return `הנקה · ${sideLabels[e.details.side] ?? ""} · ${e.details.minutes} דק׳`;
+  }
+  if (e.type === "sleep") {
+    if (!e.ended_at) return "שינה · ישן/ה עכשיו";
+    return `שינה · ${formatDuration(new Date(e.ended_at).getTime() - new Date(e.started_at).getTime())}`;
+  }
+  return "";
+}
+
+export function timeHM(iso: string) {
+  return new Date(iso).toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" });
+}
+
+export function toLocalInput(iso: string) {
+  const d = new Date(iso);
+  const off = d.getTimezoneOffset() * 60000;
+  return new Date(d.getTime() - off).toISOString().slice(0, 16);
+}
