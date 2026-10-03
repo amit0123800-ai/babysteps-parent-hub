@@ -77,10 +77,9 @@ export function Onboarding({ initialCode, onDone }: { initialCode?: string | und
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium">מין</label>
-              <div className="grid grid-cols-3 gap-2">
-                <ChoiceButton active={gender === "boy"} onClick={() => setGender("boy")}>בן</ChoiceButton>
-                <ChoiceButton active={gender === "girl"} onClick={() => setGender("girl")}>בת</ChoiceButton>
-                <ChoiceButton active={gender === "other"} onClick={() => setGender("other")}>אחר</ChoiceButton>
+              <div className="grid grid-cols-2 gap-2">
+                <ChoiceButton active={gender === "boy"} onClick={() => setGender("boy")}>👦 בן</ChoiceButton>
+                <ChoiceButton active={gender === "girl"} onClick={() => setGender("girl")}>👧 בת</ChoiceButton>
               </div>
             </div>
           </>

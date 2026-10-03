@@ -37,6 +37,16 @@
   --color-diaper-soft: var(--diaper-soft);
   --color-sleep: var(--sleep);
   --color-sleep-soft: var(--sleep-soft);
+  --color-med: var(--med);
+  --color-med-soft: var(--med-soft);
+  --color-temp: var(--temp);
+  --color-temp-soft: var(--temp-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
   --color-overlay: var(--overlay);
 }
 
@@ -67,6 +77,16 @@
   --diaper-soft: oklch(0.93 0.03 215);
   --sleep: oklch(0.52 0.09 280);
   --sleep-soft: oklch(0.93 0.03 280);
+  --med: oklch(0.55 0.12 150);
+  --med-soft: oklch(0.93 0.04 150);
+  --temp: oklch(0.6 0.17 20);
+  --temp-soft: oklch(0.94 0.035 20);
+  --ok: oklch(0.52 0.12 150);
+  --ok-soft: oklch(0.93 0.05 150);
+  --warn: oklch(0.55 0.12 75);
+  --warn-soft: oklch(0.94 0.08 90);
+  --danger: oklch(0.55 0.2 27);
+  --danger-soft: oklch(0.93 0.05 27);
   --overlay: oklch(0.2 0.02 60 / 45%);
 }
 
@@ -97,6 +117,16 @@
   --diaper-soft: oklch(0.13 0.015 215);
   --sleep: oklch(0.5 0.07 280);
   --sleep-soft: oklch(0.13 0.015 280);
+  --med: oklch(0.5 0.07 150);
+  --med-soft: oklch(0.13 0.015 150);
+  --temp: oklch(0.5 0.1 20);
+  --temp-soft: oklch(0.13 0.02 20);
+  --ok: oklch(0.5 0.08 150);
+  --ok-soft: oklch(0.13 0.02 150);
+  --warn: oklch(0.58 0.09 80);
+  --warn-soft: oklch(0.15 0.03 80);
+  --danger: oklch(0.52 0.13 27);
+  --danger-soft: oklch(0.15 0.04 27);
   --overlay: oklch(0 0 0 / 75%);
 }
 
